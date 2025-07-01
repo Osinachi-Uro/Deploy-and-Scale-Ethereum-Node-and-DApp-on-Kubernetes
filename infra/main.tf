@@ -28,10 +28,7 @@ module "eks" {
   cluster_name    = "election-dapp-cluster"
   cluster_version = "1.31"
 
-  # Optional
-  cluster_endpoint_public_access = true
-
-  # Optional: Adds the current caller identity as an administrator via cluster access entry
+  cluster_endpoint_public_access           = true
   enable_cluster_creator_admin_permissions = true
 
   cluster_compute_config = {
@@ -39,8 +36,11 @@ module "eks" {
     node_pools = ["general-purpose"]
   }
 
-  vpc_id     = "vpc-1234556abcdef"
-  subnet_ids = ["subnet-abcde012", "subnet-bcde012a", "subnet-fghi345a"]
+  # Referencing VPC outputs from the module
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
+
+  depends_on = [module.vpc]
 
   tags = {
     Environment = "dev"
