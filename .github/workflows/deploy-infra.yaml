@@ -1,0 +1,40 @@
+name: Deploy Infrastructure on AWS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/deploy-infra.yaml
+  workflow_dispatch:
+    inputs:
+      working_directory:
+        description: "Working directory"
+        required: true
+        default: "infra"
+
+env:
+  Access Key: ${{ secrets.Access Key }}
+  Secret Key: ${{ secrets.Secret Key }}
+
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
