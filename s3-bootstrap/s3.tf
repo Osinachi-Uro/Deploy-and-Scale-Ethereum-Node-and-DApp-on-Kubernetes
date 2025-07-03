@@ -5,7 +5,7 @@ provider "aws" {
 module "s3_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket = "election-DApp-terraform-state"
+  bucket = "election-DApp-terraform-state-bucket"
   acl    = "private"
 
   control_object_ownership = true

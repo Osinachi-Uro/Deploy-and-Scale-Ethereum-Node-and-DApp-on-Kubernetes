@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket = "election-DApp-terraform-state"
+    key    = "eks/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
 provider "aws" {
   region = "us-east-1"
 }
