@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - .github/workflows/deploy-infra.yaml
+      - ./infra
   workflow_dispatch:
     inputs:
       working_directory:
