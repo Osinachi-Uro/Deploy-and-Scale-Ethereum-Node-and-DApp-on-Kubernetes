@@ -1,32 +1,20 @@
-# terraform {
-#   backend "s3" {
-#     bucket = "election-DApp-terraform-state"
-#     key    = "eks/terraform.tfstate"
-#     region = "us-east-1"
-#   }
-# }
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0.0"
+    }
+  }
+
+  backend "s3" {
+    bucket = "election-dapp-terraform-state"
+    key    = "eks/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
 
 provider "aws" {
   region = "us-east-1"
-}
-
-module "s3_bucket" {
-  source = "terraform-aws-modules/s3-bucket/aws"
-
-  bucket = "election-DApp-terraform-state-bucket"
-  acl    = "private"
-
-  control_object_ownership = true
-  object_ownership         = "ObjectWriter"
-
-  versioning = {
-    enabled = true
-  }
-
-  tags = {
-    Name        = "Terraform State Storage"
-    Environment = "dev"
-  }
 }
 
 module "vpc" {
