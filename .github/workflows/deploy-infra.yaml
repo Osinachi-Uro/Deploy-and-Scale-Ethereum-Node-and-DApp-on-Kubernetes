@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - .github/workflows/deploy-infra.yaml
-      - infra/*tf
+      - infra/*.tf
   workflow_dispatch:
     inputs:
       working_directory:
