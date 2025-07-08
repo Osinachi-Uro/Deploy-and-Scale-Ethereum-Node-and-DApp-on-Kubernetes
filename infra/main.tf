@@ -1,10 +1,12 @@
 terraform {
-  # required_providers {
-  #   aws = {
-  #     source  = "hashicorp/aws"
-  #     version = ">= 6.0.0"
-  #   }
-  # }
+  required_version = ">= 1.3.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.34"
+    }
+  }
 
   backend "s3" {
     bucket = "election-dapp-terraform-state-bucket"
