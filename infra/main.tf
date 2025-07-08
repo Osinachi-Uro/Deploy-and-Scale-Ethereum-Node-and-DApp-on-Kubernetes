@@ -40,8 +40,8 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 20.37.1"
 
-  cluster_name    = "election-dapp-cluster"
-  cluster_version = "1.33"
+  cluster_name = "election-dapp-cluster"
+  # cluster_version = "1.33"
 
   cluster_endpoint_public_access           = true
   enable_cluster_creator_admin_permissions = true
