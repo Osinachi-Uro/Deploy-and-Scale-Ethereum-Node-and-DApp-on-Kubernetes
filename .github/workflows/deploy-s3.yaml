@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - .github/workflows/deploy-s3.yaml
-      - s3/
+      - s3/*.tf
   workflow_dispatch:
     inputs:
       working_directory:
