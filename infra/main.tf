@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "6.0.0"
+      version = "6.2.0"
     }
   }
 
@@ -38,7 +38,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.37.1"
+  version = "20.37.1"
 
   cluster_name    = "election-dapp-cluster"
   cluster_version = "1.33"
