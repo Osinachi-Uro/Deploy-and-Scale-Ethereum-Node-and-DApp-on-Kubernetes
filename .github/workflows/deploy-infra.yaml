@@ -42,7 +42,7 @@ jobs:
           terraform_version: 1.6.0
 
       - name: Clear Cache Temporarily
-        run: rm -rf .terraform .terraform.lock.hcl
+        run: rm -rf .terraform .terraform.lock.hcl ~/.terraform.d.
 
       - name: Terraform Init
         run: terraform init -upgrade
