@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - .github/workflows/deploy-s3.yaml
       - s3
   workflow_dispatch:
     inputs:
