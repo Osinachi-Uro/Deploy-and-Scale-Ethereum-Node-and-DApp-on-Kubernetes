@@ -1,17 +1,17 @@
-name: Creat s3 bucket on AWS
+name: Create s3 bucket on AWS
 
 on:
   push:
     branches:
       - main
     paths:
-      - s3-bootstrap
+      - s3
   workflow_dispatch:
     inputs:
       working_directory:
         description: "Working directory"
         required: true
-        default: "s3-bootstrap"
+        default: "s3"
 
 env:
   Access Key: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./s3-bootstrap
+        working-directory: ./s3
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
