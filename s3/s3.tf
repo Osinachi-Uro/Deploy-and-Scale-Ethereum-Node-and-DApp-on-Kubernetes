@@ -16,7 +16,7 @@ module "s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "5.2.0"
 
-  bucket = "election-DApp-terraform-state-bucket"
+  bucket = "election-dapp-terraform-state-bucket"
   acl    = "private"
 
   control_object_ownership = true
