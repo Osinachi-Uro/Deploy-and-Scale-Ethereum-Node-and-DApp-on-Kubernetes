@@ -36,6 +36,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Debug Info
+        run: |
+          echo "Terraform version:"
+          terraform version
+          echo "Current working directory:"
+          pwd
+          echo "Listing files:"
+          ls -la
+
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
