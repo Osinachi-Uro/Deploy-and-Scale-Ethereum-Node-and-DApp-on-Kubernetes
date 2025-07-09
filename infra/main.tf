@@ -38,7 +38,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.31.0"
+  version = "20.37.1"
 
   cluster_name    = "election-dapp-cluster"
   cluster_version = "1.33"
