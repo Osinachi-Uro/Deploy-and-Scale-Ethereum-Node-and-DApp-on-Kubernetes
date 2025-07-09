@@ -38,7 +38,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.31.0"
+  version = "~> 20.30.0"
 
   cluster_name    = "election-dapp-cluster"
   cluster_version = "1.33"
@@ -46,9 +46,15 @@ module "eks" {
   cluster_endpoint_public_access           = true
   enable_cluster_creator_admin_permissions = true
 
-  cluster_compute_config = {
-    enabled    = true
-    node_pools = ["general-purpose"]
+  eks_managed_node_groups = {
+    general = {
+      desired_capacity = 1
+      max_capacity     = 1
+      min_capacity     = 1
+
+      instance_types = ["t2.medium"]
+      subnet_ids     = module.vpc.private_subnets
+    }
   }
 
   # Referencing VPC outputs from the module
