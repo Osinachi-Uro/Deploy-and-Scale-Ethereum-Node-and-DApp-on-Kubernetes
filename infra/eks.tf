@@ -19,8 +19,6 @@ provider "aws" {
   region = "var.region"
 }
 
-
-
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "19.21.0"
@@ -28,8 +26,8 @@ module "eks" {
   cluster_name    = "election-dapp-cluster"
   cluster_version = ">=2.7.1"
 
-  cluster_endpoint_public_access           = true
-  enable_cluster_creator_admin_permissions = true
+  cluster_endpoint_public_access = true
+  # enable_cluster_creator_admin_permissions = true
 
   eks_managed_node_group_defaults = {
     instance_types = ["t2.micro"]
@@ -46,11 +44,6 @@ module "eks" {
       subnet_ids     = module.vpc.private_subnets
     }
   }
-  # cluster_compute_config = {
-  #   enabled    = true
-  #   node_pools = ["general-purpose"]
-
-  # }
 
   # Referencing VPC outputs from the module
   vpc_id     = module.vpc.vpc_id
