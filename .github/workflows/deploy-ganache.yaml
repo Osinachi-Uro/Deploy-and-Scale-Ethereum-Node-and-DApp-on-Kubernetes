@@ -43,6 +43,9 @@ jobs:
       run: |
         aws eks update-kubeconfig --region ${{env.AWS_REGION}} --name ${{env.EKS_CLUSTER_NAME}}
 
+    - name: Confirm EKS connection
+      run: kubectl get nodes
+
     - name: Deploy Ganache to EKS via Helm
       run: |
         helm upgrade --install ganache ./ganache
