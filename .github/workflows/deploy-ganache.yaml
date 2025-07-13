@@ -36,6 +36,9 @@ jobs:
     - name: Setup kubectl
       uses: azure/setup-kubectl@v3
 
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+    
     - name: Setup kubeconfig for EKS
       run: |
         aws eks update-kubeconfig --region ${{env.AWS_REGION}} --name ${{env.EKS_CLUSTER_NAME}}
