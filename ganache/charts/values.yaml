@@ -1,0 +1,23 @@
+replicaCount: 1
+
+image:
+  repository: trufflesuite/ganache-cli
+  pullPolicy: IfNotPresent
+  tag: latest
+
+service:
+  type: LoadBalancer
+  port: 8545
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: []
+
+ganacheArgs:
+  - "-h"
+  - "0.0.0.0"
+  - "-p"
+  - "8545"
+  - "-d"

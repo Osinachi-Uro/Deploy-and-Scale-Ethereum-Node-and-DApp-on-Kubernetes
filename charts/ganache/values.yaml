@@ -1,5 +1,0 @@
-replicaCount: 1
-image:
-  repository: trufflesuite/ganache-cli
-  tag: latest
-  pullPolicy: IfNotPresent

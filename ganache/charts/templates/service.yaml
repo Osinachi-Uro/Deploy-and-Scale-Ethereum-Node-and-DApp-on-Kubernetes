@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: ganache
 spec:
+  type: {{ .Values.service.type }}
   selector:
     app: ganache
   ports:
     - protocol: TCP
-      port: 8545
+      port: {{ .Values.service.port }}
       targetPort: 8545
-  type: ClusterIP
