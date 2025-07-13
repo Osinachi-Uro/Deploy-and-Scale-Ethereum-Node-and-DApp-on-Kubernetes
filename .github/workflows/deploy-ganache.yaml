@@ -31,14 +31,14 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: $AWS_REGION
+        aws-region: ${{env.AWS_REGION}}
 
     - name: Setup kubectl
       uses: azure/setup-kubectl@v3
 
     - name: Setup kubeconfig for EKS
       run: |
-        aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
+        aws eks update-kubeconfig --region ${{env.AWS_REGION}} --name ${{env.EKS_CLUSTER_NAME}}
 
     - name: Deploy Ganache to EKS via Helm
       run: |
