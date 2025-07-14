@@ -15,8 +15,8 @@ on:
         default: "infra"
 
 env:
-  Access Key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  Secret Key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  TF_VAR_eks_admin_user_arn: ${{ secrets.EKS_ADMIN_USER_ARN }}
+  TF_VAR_eks_admin_username: ${{ secrets.EKS_ADMIN_USERNAME }}
 
 
 jobs:
@@ -34,12 +34,12 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.6.0
+          terraform_version: 1.6.6
 
       - name: Clear Cache Temporarily
         run: rm -rf .terraform .terraform.lock.hcl ~/.terraform.d./
