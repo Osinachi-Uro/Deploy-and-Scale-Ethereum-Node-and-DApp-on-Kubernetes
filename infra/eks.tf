@@ -16,7 +16,7 @@ resource "aws_eks_cluster" "cluster" {
   # Dependencies
   depends_on = [
     module.vpc,
-    aws_iam_role_policy_attachment.cluster_AmazonEKSClusterPolicy
+    aws_iam_role_policy_attachment.eks_policies
   ]
 
   tags = {
@@ -45,6 +45,6 @@ resource "aws_eks_node_group" "example" {
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
   # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
   depends_on = [
-    aws_iam_role_policy_attachment.cluster_EKSandNodeRolePolicy,
+    aws_iam_role_policy_attachment.eks_policies
   ]
 }

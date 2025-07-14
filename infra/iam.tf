@@ -17,15 +17,20 @@ resource "aws_iam_role" "cluster" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "cluster_EKSandNodeRolePolicy" {
-  policy_arn = [
+locals {
+  policies = [
     "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
     "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
     "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+    "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
   ]
-  role = aws_iam_role.cluster.name
+}
 
+resource "aws_iam_role_policy_attachment" "eks_policies" {
+  for_each   = toset(local.policies)
+  policy_arn = each.value
+  role       = aws_iam_role.cluster.name
   depends_on = [
     aws_iam_role.cluster
   ]
