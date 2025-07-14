@@ -26,11 +26,14 @@ resource "aws_eks_cluster" "cluster" {
   }
 }
 
-resource "aws_eks_node_group" "example" {
+resource "aws_eks_node_group" "dapp" {
   cluster_name    = aws_eks_cluster.cluster.name
   node_group_name = "${var.cluster_name}-node_group"
   node_role_arn   = aws_iam_role.cluster.arn
   subnet_ids      = module.vpc.private_subnets
+  instance_types  = ["t2.micro"]
+  ami_type        = "AL2_x86_64"
+  capacity_type   = "ON_DEMAND"
 
   scaling_config {
     desired_size = 1
