@@ -5,7 +5,7 @@ variable "region" {
 
 variable "cluster_name" {
   description = "name of the kubernetes cluster"
-  default     = "election-dapp-cluster"
+  sensitive   = true
   type        = string
 }
 
