@@ -14,10 +14,6 @@ on:
         required: true
         default: "ganache"
 
-env:
-  AWS_REGION: us-east-1
-  EKS_CLUSTER_NAME: election-dapp-cluster
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -31,7 +27,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{env.AWS_REGION}}
+        aws-region: ${{ secrets.AWS_REGION }}
 
     - name: Setup kubectl
       uses: azure/setup-kubectl@v3
@@ -41,7 +37,7 @@ jobs:
     
     - name: Setup kubeconfig for EKS
       run: |
-        aws eks update-kubeconfig --region ${{env.AWS_REGION}} --name ${{env.EKS_CLUSTER_NAME}}
+        aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
     - name: Confirm EKS connection
       run: kubectl get nodes
