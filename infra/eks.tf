@@ -2,7 +2,8 @@ resource "aws_eks_cluster" "cluster" {
   name = var.cluster_name
 
   access_config {
-    authentication_mode = "API"
+    authentication_mode                         = "API"
+    bootstrap_cluster_creator_admin_permissions = true
   }
 
   role_arn = aws_iam_role.cluster.arn
@@ -10,13 +11,16 @@ resource "aws_eks_cluster" "cluster" {
 
   vpc_config {
     # Referencing VPC outputs from the module
-    subnet_ids = module.vpc.private_subnets
+    subnet_ids              = module.vpc.private_subnets
+    endpoint_private_access = false
+    endpoint_public_access  = true
+
   }
 
   # Dependencies
   depends_on = [
     module.vpc,
-    aws_iam_role_policy_attachment.eks_policies
+    aws_iam_role_policy_attachment.cluster_AmazonEKSClusterPolicy
   ]
 
   tags = {
@@ -24,30 +28,4 @@ resource "aws_eks_cluster" "cluster" {
     Terraform   = "true"
     ProjectName = var.ProjectName
   }
-}
-
-resource "aws_eks_node_group" "dapp" {
-  cluster_name    = aws_eks_cluster.cluster.name
-  node_group_name = "${var.cluster_name}-node_group"
-  node_role_arn   = aws_iam_role.cluster.arn
-  subnet_ids      = module.vpc.private_subnets
-  instance_types  = ["t2.micro"]
-  ami_type        = "AL2_x86_64"
-  capacity_type   = "ON_DEMAND"
-
-  scaling_config {
-    desired_size = 1
-    max_size     = 2
-    min_size     = 1
-  }
-
-  update_config {
-    max_unavailable = 1
-  }
-
-  # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
-  # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
-  depends_on = [
-    aws_iam_role_policy_attachment.eks_policies
-  ]
 }
