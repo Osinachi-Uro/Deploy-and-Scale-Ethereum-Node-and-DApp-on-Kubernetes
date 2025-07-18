@@ -13,7 +13,7 @@ resources: {}
 
 nodeSelector: {}
 tolerations: []
-affinity: []
+affinity: {}
 
 ganacheArgs:
   - "-h"
