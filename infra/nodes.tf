@@ -3,7 +3,7 @@ resource "aws_eks_node_group" "dapp" {
   node_group_name = "${var.cluster_name}-node_group"
   node_role_arn   = aws_iam_role.nodes.arn
   subnet_ids      = module.vpc.private_subnets
-  instance_types  = ["t2.micro"]
+  instance_types  = ["t3.small"]
   ami_type        = "AL2_x86_64"
   capacity_type   = "ON_DEMAND"
 
