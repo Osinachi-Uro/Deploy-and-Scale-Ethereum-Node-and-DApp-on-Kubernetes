@@ -1,0 +1,21 @@
+{
+  "name": "election",
+  "version": "1.0.0",
+  "description": "A simple Ethereum election DApp using Truffle",
+  "main": "truffle-config.js",
+  "scripts": {
+    "dev": "lite-server",
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "test": "truffle test"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  },
+  "dependencies": {
+    "truffle": "^5.11.5",
+    "http-server": "^14.1.1"
+  }
+}
