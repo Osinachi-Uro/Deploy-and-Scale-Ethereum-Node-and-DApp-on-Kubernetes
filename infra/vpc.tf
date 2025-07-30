@@ -33,7 +33,8 @@ resource "aws_security_group" "eks_nodes_sg" {
 resource "aws_vpc_security_group_ingress_rule" "node_to_node" {
   security_group_id            = aws_security_group.eks_nodes_sg.id
   description                  = "Allow node-to-node communication"
-  cidr_ipv4                    = var.vpc_cidr
+  from_port                    = 0
+  to_port                      = 0
   ip_protocol                  = "-1" # all protocols
   referenced_security_group_id = aws_security_group.eks_nodes_sg.id
 }
