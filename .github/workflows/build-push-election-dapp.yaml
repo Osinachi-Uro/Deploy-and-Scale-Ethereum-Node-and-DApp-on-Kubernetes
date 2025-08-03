@@ -52,18 +52,8 @@ jobs:
 
     - name: Build and tag Docker image
       run: |
-        docker build -t ${{ steps.login-ecr.outputs.registry }}/${{ env.REPOSITORY_NAME }}:latest ./
+        docker build -t ${{ env.REPOSITORY_NAME }}:latest ./
 
     - name: Push image to Amazon ECR
       run: |
-        docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.REPOSITORY_NAME }}:latest
-
-    - name: Setup kubectl
-      uses: azure/setup-kubectl@v3
-
-    - name: Configure kubeconfig for EKS
-      run: |
-        aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
-
-    - name: Deploy Argo CD Application for DAapp
-      run: kubectl apply -f DApp/argocd.yaml
+        docker push ${{ env.REPOSITORY_NAME }}:latest
