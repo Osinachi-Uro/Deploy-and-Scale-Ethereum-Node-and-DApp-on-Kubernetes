@@ -17,7 +17,7 @@ on:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
-  REPOSITORY_NAME: ${{ secrets.ECR_REGISTRY }}
+  REPOSITORY_NAME: ${{ secrets.REPOSITORY_NAME }}
 
 jobs:
   deploy:
