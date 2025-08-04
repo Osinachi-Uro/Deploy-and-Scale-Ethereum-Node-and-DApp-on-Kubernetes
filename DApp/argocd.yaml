@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dapp
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Osinachi-Uro/Deploying-an-Ethereum-Node-and-DApp-on-Kubernetes
+    targetRevision: main
+    path: DApp/helm
+    helm:
+      valueFiles:
+        - values.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

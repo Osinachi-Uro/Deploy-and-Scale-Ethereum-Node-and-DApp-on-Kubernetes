@@ -1,0 +1,8 @@
+image:
+  repository: 213749874755.dkr.ecr.us-east-1.amazonaws.com/election-dapp
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 3000
