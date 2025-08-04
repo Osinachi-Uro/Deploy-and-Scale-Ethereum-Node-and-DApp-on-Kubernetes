@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - DApp/argocd.yaml
+      - .github/workflows/apply-argocd.yaml
 
 jobs:
   apply-argocd-app:
