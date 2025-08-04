@@ -1,8 +1,8 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: dapp
-  namespace: argocd
+  name: election-dapp
+  namespace: default
 spec:
   project: default
 
