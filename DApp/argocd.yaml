@@ -15,7 +15,7 @@ spec:
         - values.yaml
 
   destination:
-    server: https://585082CC26F27019121F3B69D4BFC762.gr7.us-east-1.eks.amazonaws.com
+    server: https://0B263715CC8EBC3EF47E4B4B531D489C.gr7.us-east-1.eks.amazonaws.com
     namespace: default
 
   syncPolicy:
