@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: ganache
-        image: trufflesuite/ganache:latest
+        image: trufflesuite/ganache-cli:latest
         ports:
         - containerPort: 8545
         command:
