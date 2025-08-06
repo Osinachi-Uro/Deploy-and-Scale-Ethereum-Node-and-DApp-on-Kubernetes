@@ -16,7 +16,7 @@ resource "kubernetes_manifest" "ganache_application" {
       }
       destination = {
         server    = "https://kubernetes.default.svc"
-        namespace = kubernetes_namespace.ganache.metadata[0].name
+        namespace = kubernetes_namespace.argocd.metadata[0].name
       }
       syncPolicy = {
         automated = {
