@@ -12,7 +12,7 @@ resource "aws_eks_cluster" "cluster" {
   vpc_config {
     # Referencing VPC outputs from the module
     subnet_ids              = module.vpc.private_subnets
-    endpoint_private_access = false
+    endpoint_private_access = true
     endpoint_public_access  = true
 
   }

@@ -15,3 +15,5 @@ Variable Values
 argocd-eks-cluster-access-secret.yaml
 config.json
 config.b64
+aws-auth.yaml
+argocd-eks-cluster-access-secret-2.yaml

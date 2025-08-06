@@ -4,5 +4,5 @@ description: A Helm chart for deploying Ganache (Ethereum dev node) to Kubernete
 
 type: application
 version: 0.1.0
-appVersion: "7.9.1"
+appVersion: "latest"
 
