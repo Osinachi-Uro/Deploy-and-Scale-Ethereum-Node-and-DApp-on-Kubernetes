@@ -35,6 +35,12 @@ resource "helm_release" "argocd" {
         service = {
           type = "LoadBalancer"
         }
+      },
+      controller = {
+        clusterRole = {
+          create = true
+          name   = "cluster-admin"
+        }
       }
     })
   ]
@@ -42,23 +48,23 @@ resource "helm_release" "argocd" {
   depends_on = [aws_eks_node_group.dapp]
 }
 
-# Give ArgoCD proper permissions
-resource "kubernetes_cluster_role_binding" "argocd_admin" {
-  metadata {
-    name = "argocd-application-controller"
-  }
+# # Give ArgoCD proper permissions
+# resource "kubernetes_cluster_role_binding" "argocd_admin" {
+#   metadata {
+#     name = "argocd-application-controller"
+#   }
 
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "cluster-admin"
-  }
+#   role_ref {
+#     api_group = "rbac.authorization.k8s.io"
+#     kind      = "ClusterRole"
+#     name      = "cluster-admin"
+#   }
 
-  subject {
-    kind      = "ServiceAccount"
-    name      = "argocd-application-controller"
-    namespace = "argocd"
-  }
+#   subject {
+#     kind      = "ServiceAccount"
+#     name      = "argocd-application-controller"
+#     namespace = "argocd"
+#   }
 
-  depends_on = [helm_release.argocd]
-}
+#   depends_on = [helm_release.argocd]
+# }
