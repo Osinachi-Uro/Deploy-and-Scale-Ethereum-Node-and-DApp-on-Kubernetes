@@ -7,6 +7,7 @@
 
 #Terraform dependency lock
 .terraform.lock.hcl
+.terraform
 
 Variable Values
 *.tfvars

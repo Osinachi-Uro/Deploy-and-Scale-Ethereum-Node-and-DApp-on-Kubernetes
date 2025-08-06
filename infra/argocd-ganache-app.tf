@@ -1,5 +1,6 @@
-# argocd-ganache-app.tf
+
 resource "kubernetes_manifest" "ganache_application" {
+  provider = kubernetes.eks
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
     kind       = "Application"
