@@ -2,6 +2,14 @@ provider "aws" {
   region = var.region
 }
 
+data "aws_eks_cluster" "cluster" {
+  name = aws_eks_cluster.cluster.name
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = aws_eks_cluster.cluster.name
+}
+
 provider "kubernetes" {
   alias                  = "eks"
   host                   = aws_eks_cluster.cluster.endpoint
@@ -13,6 +21,3 @@ provider "helm" {
 
 }
 
-data "aws_eks_cluster_auth" "cluster" {
-  name = aws_eks_cluster.cluster.name
-}
