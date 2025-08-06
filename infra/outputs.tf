@@ -30,9 +30,7 @@ data "kubernetes_service" "ganache" {
 
 output "ganache_rpc_url" {
   description = "Ganache RPC URL"
-  value = var.Environment == "dev" ? 
-    "http://${data.kubernetes_service.ganache.status.0.load_balancer.0.ingress.0.hostname}:8545" :
-    "http://ganache.ganache.svc.cluster.local:8545"
+  value       = var.Environment == "dev" ? "http://${data.kubernetes_service.ganache.status.0.load_balancer.0.ingress.0.hostname}:8545" : "http://ganache.ganache.svc.cluster.local:8545"
 }
 
 output "ganache_network_id" {
