@@ -1,0 +1,80 @@
+# .github/workflows/deploy-app.yml
+name: Deploy Election DApp
+
+on:
+  workflow_run:
+    workflows: ["Docker build-push & Deploy Election DApp to EKS Cluster"]
+    types:
+      - completed 
+  push:
+    branches: [ main ]
+    paths:
+      - 'k8s/**'
+      - '.github/workflows/deploy-app.yml'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REPOSITORY: ${{ secrets.REPOSITORY_NAME }}
+
+jobs:
+  deploy:
+    name: Deploy to EKS
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
+
+    - name: Deploy Ganache
+      run: |
+        echo "Deploying Ganache..."
+        kubectl apply -f k8s/ganache.yaml
+        kubectl wait --for=condition=available --timeout=300s deployment/ganache -n ganache
+
+    - name: Update deployment with ECR image
+      run: |
+        # Replace placeholder with actual ECR URI
+        sed -i "s|YOUR_ECR_URI|${{ env.ECR_REGISTRY }}|g" k8s/deployment.yaml
+        sed -i "s|election-dapp:latest|${{ env.ECR_REPOSITORY }}:${{ github.sha }}|g" k8s/deployment.yaml
+
+    - name: Deploy Election DApp
+      run: |
+        echo "Deploying Election DApp..."
+        kubectl apply -f k8s/namespace.yaml
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml
+
+    - name: Wait for deployment
+      run: |
+        kubectl wait --for=condition=available --timeout=300s deployment/election-dapp -n election-dapp
+
+    - name: Create ArgoCD Application
+      run: |
+        echo "Creating ArgoCD Application..."
+        kubectl apply -f k8s/argocd-application.yaml
+
+    - name: Get service URLs
+      run: |
+        echo "=== Deployment Complete ==="
+        echo "Election DApp URL:"
+        kubectl get svc election-dapp -n election-dapp -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+        echo ""
+        echo "Ganache RPC URL (internal):"
+        echo "http://ganache.ganache.svc.cluster.local:8545"
+        echo ""
+        echo "ArgoCD URL:"
+        kubectl get svc argocd-server -n argocd -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'

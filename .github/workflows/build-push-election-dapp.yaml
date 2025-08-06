@@ -1,12 +1,16 @@
 name: Docker build-push & Deploy Election DApp to EKS Cluster
 
 on:
+  workflow_run:
+    workflows: ["Deploy EKS Infrastructure 2 on AWS"]
+    types:
+      - completed  
   push:
     branches: 
       - main
     paths:
       - .github/workflows/build-push-election-dapp.yaml
-      - DApp/*
+      - DApp-2/*
   workflow_dispatch:
     inputs:
       working_directory:

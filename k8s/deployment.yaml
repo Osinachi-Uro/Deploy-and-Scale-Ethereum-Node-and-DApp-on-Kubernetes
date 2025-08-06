@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: election-dapp
+  namespace: election-dapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: election-dapp
+  template:
+    metadata:
+      labels:
+        app: election-dapp
+    spec:
+      containers:
+      - name: election-dapp
+        image: 213749874755.dkr.ecr.us-east-1.amazonaws.com/election-dapp:latest  
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GANACHE_URL
+          value: "http://ganache.ganache.svc.cluster.local:8545"
+        - name: NETWORK_ID
+          value: "1337"

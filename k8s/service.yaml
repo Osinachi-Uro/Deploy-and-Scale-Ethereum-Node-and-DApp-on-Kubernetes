@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: election-dapp
+  namespace: election-dapp
+spec:
+  selector:
+    app: election-dapp
+  ports:
+  - port: 80
+    targetPort: 3000
+  type: LoadBalancer
