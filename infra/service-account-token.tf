@@ -38,7 +38,7 @@ data "kubernetes_secret" "argocd_sa_token" {
 # Create ArgoCD cluster secret with proper service account authentication
 resource "kubernetes_secret" "argocd_cluster" {
   metadata {
-    name      = "${aws_eks_cluster.main.name}-cluster"
+    name      = "${aws_eks_cluster.cluster.name}-cluster"
     namespace = kubernetes_namespace.argocd.metadata[0].name
     labels = {
       "argocd.argoproj.io/secret-type" = "cluster"
@@ -48,12 +48,12 @@ resource "kubernetes_secret" "argocd_cluster" {
   type = "Opaque"
 
   data = {
-    name   = aws_eks_cluster.main.name
-    server = aws_eks_cluster.main.endpoint
+    name   = aws_eks_cluster.cluster.name
+    server = aws_eks_cluster.cluster.endpoint
     config = base64encode(jsonencode({
       bearerToken = base64decode(data.kubernetes_secret.argocd_sa_token.data["token"])
       tlsClientConfig = {
-        caData = aws_eks_cluster.main.certificate_authority[0].data
+        caData = aws_eks_cluster.cluster.certificate_authority[0].data
       }
     }))
   }
