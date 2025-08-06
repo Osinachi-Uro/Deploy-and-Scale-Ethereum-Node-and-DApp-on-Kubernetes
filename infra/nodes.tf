@@ -1,4 +1,5 @@
 #Create node groups
+
 resource "aws_eks_node_group" "dapp" {
   cluster_name    = aws_eks_cluster.cluster.name
   node_group_name = "${var.cluster_name}-node_group"
@@ -31,5 +32,3 @@ resource "aws_eks_node_group" "dapp" {
   }
 
 }
-
-

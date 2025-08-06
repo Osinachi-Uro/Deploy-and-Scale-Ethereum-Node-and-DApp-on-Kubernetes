@@ -23,9 +23,9 @@ output "argocd_admin_password" {
 data "kubernetes_service" "ganache" {
   metadata {
     name      = "ganache"
-    namespace = kubernetes_namespace.ganache.metadata[0].name
+    namespace = kubernetes_namespace.argocd.metadata[0].name
   }
-  depends_on = [helm_release.ganache]
+  depends_on = [helm_release.argocd]
 }
 
 output "ganache_rpc_url" {
