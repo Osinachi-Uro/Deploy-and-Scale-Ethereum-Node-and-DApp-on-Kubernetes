@@ -47,9 +47,8 @@ jobs:
 
     - name: Update deployment with ECR image
       run: |
-        # Replace placeholder with actual ECR URI
         sed -i "s|YOUR_ECR_URI|${{ env.ECR_REGISTRY }}|g" k8s/deployment.yaml
-        sed -i "s|election-dapp:latest|${{ env.ECR_REPOSITORY }}:${{ github.sha }}|g" k8s/deployment.yaml
+        sed -i "s|election-dapp:latest|${{ env.ECR_REPOSITORY }}:latest|g" k8s/deployment.yaml
 
     - name: Deploy Election DApp
       run: |
