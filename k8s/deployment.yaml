@@ -17,7 +17,7 @@ spec:
       - name: election-dapp
         image: 213749874755.dkr.ecr.us-east-1.amazonaws.com/election-dapp:latest  
         ports:
-        - containerPort: 3000
+        - containerPort: 8080
         env:
         - name: GANACHE_URL
           value: "http://ganache.ganache.svc.cluster.local:8545"
