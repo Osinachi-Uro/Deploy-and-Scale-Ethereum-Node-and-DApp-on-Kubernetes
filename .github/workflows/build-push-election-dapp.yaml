@@ -1,4 +1,4 @@
-name: Docker build-push & Deploy Election DApp to EKS Cluster
+name: Docker build-push Election DApp Image to ECR
 
 on:
   workflow_run:
@@ -10,7 +10,7 @@ on:
       - main
     paths:
       - .github/workflows/build-push-election-dapp.yaml
-      - DApp-2/*
+      - DApp/*
   workflow_dispatch:
     inputs:
       working_directory:

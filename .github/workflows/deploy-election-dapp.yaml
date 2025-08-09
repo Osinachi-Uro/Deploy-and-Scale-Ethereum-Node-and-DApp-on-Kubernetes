@@ -1,16 +1,15 @@
-# .github/workflows/deploy-app.yml
 name: Deploy Election DApp
 
 on:
   workflow_run:
-    workflows: ["Docker build-push & Deploy Election DApp to EKS Cluster"]
+    workflows: ["Docker build-push Election DApp Image to ECR"]
     types:
       - completed 
   push:
     branches: [ main ]
     paths:
       - 'k8s/**'
-      - '.github/workflows/deploy-app.yml'
+      - '.github/workflows/deploy-electon-dapp.yaml'
   workflow_dispatch:
 
 env:
@@ -47,7 +46,7 @@ jobs:
 
     - name: Update deployment with ECR image
       run: |
-        sed -i "s|YOUR_ECR_URI|${{ env.ECR_REGISTRY }}|g" k8s/deployment.yaml
+        sed -i "s|${{ env.ECR_REGISTRY }}|g" k8s/deployment.yaml
         sed -i "s|election-dapp:latest|${{ env.ECR_REPOSITORY }}:latest|g" k8s/deployment.yaml
 
     - name: Deploy Election DApp
@@ -60,6 +59,21 @@ jobs:
     - name: Wait for deployment
       run: |
         kubectl wait --for=condition=available --timeout=300s deployment/election-dapp -n election-dapp
+
+    - name: Deploy ArgoCD Notifications configs
+      run: |
+        echo "Deploying ArgoCD notification configs..."
+        kubectl apply -f k8s/notifications/argocd-notifications-cm.yaml
+        kubectl apply -f k8s/notifications/argocd-notifications-triggers.yaml
+        kubectl apply -f k8s/notifications/argocd-notifications-secret.yaml
+
+    - name: Patch Slack webhook secret from GitHub Actions
+      run: |
+        echo "Patching Slack webhook secret..."
+        kubectl patch secret argocd-notifications-secret \
+          -n argocd \
+          --type='json' \
+          -p='[{"op": "replace", "path": "/stringData/slack-token", "value":"'"${{ secrets.SLACK_WEBHOOK_URL }}"'"}]'
 
     - name: Create ArgoCD Application
       run: |

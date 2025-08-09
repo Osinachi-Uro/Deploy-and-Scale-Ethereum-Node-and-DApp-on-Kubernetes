@@ -3,10 +3,17 @@ kind: Application
 metadata:
   name: election-dapp
   namespace: argocd
+  annotations:
+    notifications.argoproj.io/subscribe.on-deployed.slack: "true"
+    notifications.argoproj.io/subscribe.on-sync-failed.slack: "true"
+    notifications.argoproj.io/subscribe.on-health-degraded.slack: "true"
+    notifications.argoproj.io/subscribe.on-sync-running.slack: "true"
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: "true"
+    notifications.argoproj.io/subscribe.on-manual-sync.slack: "true"
 spec:
   project: default
   source:
-    repoURL: https://github.com/Osinachi-Uro/Deploying-and-Scale-Ethereum-Node-and-DApp-on-Kubernetes
+    repoURL: https://github.com/Osinachi-Uro/Deploy-and-Scale-Ethereum-Node-and-DApp-on-Kubernetes
     targetRevision: HEAD
     path: k8s
   destination:
