@@ -1,6 +1,5 @@
-# k8s/argocd-notifications-cm.yaml
 apiVersion: v1
-kind: ConfigMap
+kind: Config
 metadata:
   name: argocd-notifications-cm
   namespace: argocd
