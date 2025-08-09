@@ -5,10 +5,8 @@ metadata:
   name: argocd-notifications-cm
   namespace: argocd
 data:
-  config.yaml: |
-    services:
-      slack:
-        token: $slack-token
+  service.slack: |
+    token: $slack-token
     
     templates:
       app-deployed: |
