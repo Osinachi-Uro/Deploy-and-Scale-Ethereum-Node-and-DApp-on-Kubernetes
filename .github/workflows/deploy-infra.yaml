@@ -1,12 +1,12 @@
-name: Deploy EKS Infrastructure 2 on AWS
+name: Deploy EKS Infrastructure on AWS
 
 on:
   push:
     branches:
       - main
     paths:
-      - .github/workflows/deploy-infra-2.yaml
-      - infra-2/*.tf
+      - .github/workflows/deploy-infra.yaml
+      - infra/*.tf
   workflow_dispatch:
     inputs:
       working_directory:
