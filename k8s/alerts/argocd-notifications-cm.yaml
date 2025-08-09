@@ -1,193 +1,47 @@
 apiVersion: v1
-kind: Config
+kind: ConfigMap
 metadata:
   name: argocd-notifications-cm
   namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-notifications-controller
+    app.kubernetes.io/part-of: argocd
 data:
   service.slack: |
     token: $slack-token
-    
-    templates:
-      app-deployed: |
-        message: |
-          🚀 **{{.app.metadata.name}}** successfully deployed to **{{.app.spec.destination.namespace}}**!
-        slack:
-          attachments: |
-            [{
-              "title": "{{.app.metadata.name}} - Deployment Successful",
-              "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
-              "color": "#18be52",
-              "fields": [
-                {
-                  "title": "Environment",
-                  "value": "{{.app.spec.destination.namespace}}",
-                  "short": true
-                },
-                {
-                  "title": "Sync Status",
-                  "value": "{{.app.status.sync.status}}",
-                  "short": true
-                },
-                {
-                  "title": "Health",
-                  "value": "{{.app.status.health.status}}",
-                  "short": true
-                },
-                {
-                  "title": "Repository",
-                  "value": "{{.app.spec.source.repoURL}}",
-                  "short": true
-                },
-                {
-                  "title": "Revision",
-                  "value": "{{.app.status.sync.revision | substr 0 7}}",
-                  "short": true
-                },
-                {
-                  "title": "Author",
-                  "value": "{{.app.status.operationState.operation.initiatedBy.username}}",
-                  "short": true
-                }
-              ],
-              "footer": "ArgoCD",
-              "ts": "{{.app.status.operationState.finishedAt | toDate \"2006-01-02T15:04:05Z07:00\" | toUnix}}"
-            }]
-
-      app-sync-failed: |
-        message: |
-          ❌ **{{.app.metadata.name}}** deployment failed!
-        slack:
-          attachments: |
-            [{
-              "title": "{{.app.metadata.name}} - Deployment Failed",
-              "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
-              "color": "#E96D76",
-              "fields": [
-                {
-                  "title": "Environment",
-                  "value": "{{.app.spec.destination.namespace}}",
-                  "short": true
-                },
-                {
-                  "title": "Sync Status",
-                  "value": "{{.app.status.sync.status}}",
-                  "short": true
-                },
-                {
-                  "title": "Operation State",
-                  "value": "{{.app.status.operationState.phase}}",
-                  "short": true
-                },
-                {
-                  "title": "Repository",
-                  "value": "{{.app.spec.source.repoURL}}",
-                  "short": true
-                },
-                {
-                  "title": "Error Message",
-                  "value": "{{.app.status.operationState.message}}",
-                  "short": false
-                }
-              ],
-              "footer": "ArgoCD",
-              "ts": "{{.app.status.operationState.finishedAt | toDate \"2006-01-02T15:04:05Z07:00\" | toUnix}}"
-            }]
-
-      app-health-degraded: |
-        message: |
-          ⚠️ **{{.app.metadata.name}}** health is degraded!
-        slack:
-          attachments: |
-            [{
-              "title": "{{.app.metadata.name}} - Health Degraded",
-              "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
-              "color": "#f4c430",
-              "fields": [
-                {
-                  "title": "Environment",
-                  "value": "{{.app.spec.destination.namespace}}",
-                  "short": true
-                },
-                {
-                  "title": "Health Status",
-                  "value": "{{.app.status.health.status}}",
-                  "short": true
-                },
-                {
-                  "title": "Sync Status",
-                  "value": "{{.app.status.sync.status}}",
-                  "short": true
-                },
-                {
-                  "title": "Repository",
-                  "value": "{{.app.spec.source.repoURL}}",
-                  "short": true
-                }
-              ],
-              "footer": "ArgoCD"
-            }]
-
-      app-sync-running: |
-        message: |
-          🔄 **{{.app.metadata.name}}** deployment in progress...
-        slack:
-          attachments: |
-            [{
-              "title": "{{.app.metadata.name}} - Deployment Started",
-              "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
-              "color": "#0DADEA",
-              "fields": [
-                {
-                  "title": "Environment",
-                  "value": "{{.app.spec.destination.namespace}}",
-                  "short": true
-                },
-                {
-                  "title": "Operation",
-                  "value": "{{.app.status.operationState.operation.sync.strategy.hook.force | default \"Sync\"}}",
-                  "short": true
-                },
-                {
-                  "title": "Repository",
-                  "value": "{{.app.spec.source.repoURL}}",
-                  "short": true
-                },
-                {
-                  "title": "Initiated By",
-                  "value": "{{.app.status.operationState.operation.initiatedBy.username}}",
-                  "short": true
-                }
-              ],
-              "footer": "ArgoCD"
-            }]
-
-    triggers:
-      on-deployed:
-        - oncePer: app.status.sync.revision
-          send:
-          - app-deployed
-          when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
-      
-      on-sync-failed:
-        - send:
-          - app-sync-failed
-          when: app.status.operationState.phase in ['Error', 'Failed']
-      
-      on-health-degraded:
-        - send:
-          - app-health-degraded
-          when: app.status.health.status == 'Degraded'
-      
-      on-sync-running:
-        - send:
-          - app-sync-running
-          when: app.status.operationState.phase in ['Running']
-
-    subscriptions:
-      - recipients:
-        - slack
-        triggers:
-        - on-deployed
-        - on-sync-failed
-        - on-health-degraded
-        - on-sync-running
+    username: ArgoCD Bot
+    icon: ":rocket:"
+  trigger.on-deployed: |
+    when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+    send: [app-deployed]
+  trigger.on-sync-failed: |
+    when: app.status.operationState.phase == 'Failed'
+    send: [app-sync-failed]
+  template.app-deployed: |
+    message: |
+      :tada: Application {{.app.metadata.name}} is now running version {{.app.status.sync.revision}} in namespace {{.app.metadata.namespace}}.
+    slack:
+      attachments: |
+        [{
+          "color": "#18be52",
+          "blocks": [
+            {
+              "type": "section",
+              "text": { "type": "mrkdwn", "text": ":tada: *Application {{.app.metadata.name}}* is now running version `{{.app.status.sync.revision}}` in namespace `{{.app.metadata.namespace}}`" }
+            }
+          ]
+        }]
+  template.app-sync-failed: |
+    message: |
+      :x: Application {{.app.metadata.name}} failed to sync.
+    slack:
+      attachments: |
+        [{
+          "color": "#e11d48",
+          "blocks": [
+            {
+              "type": "section",
+              "text": { "type": "mrkdwn", "text": ":x: *Application {{.app.metadata.name}}* failed to sync." }
+            }
+          ]
+        }]
