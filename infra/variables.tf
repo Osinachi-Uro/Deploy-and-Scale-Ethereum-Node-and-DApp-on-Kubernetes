@@ -39,4 +39,8 @@ variable "eks_admin_username" {
   type        = string
 }
 
-
+variable "slack_webhook_url" {
+  description = "Slack webhook URL for ArgoCD notifications"
+  type        = string
+  sensitive   = true
+}
