@@ -3,45 +3,79 @@ kind: ConfigMap
 metadata:
   name: argocd-notifications-cm
   namespace: argocd
-  labels:
-    app.kubernetes.io/name: argocd-notifications-controller
-    app.kubernetes.io/part-of: argocd
 data:
-  service.slack: |
-    token: $slack-token
-    username: ArgoCD Bot
-    icon: ":rocket:"
-  trigger.on-deployed: |
-    when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
-    send: [app-deployed]
-  trigger.on-sync-failed: |
-    when: app.status.operationState.phase == 'Failed'
-    send: [app-sync-failed]
-  template.app-deployed: |
-    message: |
-      :tada: Application {{.app.metadata.name}} is now running version {{.app.status.sync.revision}} in namespace {{.app.metadata.namespace}}.
-    slack:
-      attachments: |
-        [{
-          "color": "#18be52",
-          "blocks": [
-            {
-              "type": "section",
-              "text": { "type": "mrkdwn", "text": ":tada: *Application {{.app.metadata.name}}* is now running version `{{.app.status.sync.revision}}` in namespace `{{.app.metadata.namespace}}`" }
-            }
-          ]
-        }]
-  template.app-sync-failed: |
-    message: |
-      :x: Application {{.app.metadata.name}} failed to sync.
-    slack:
-      attachments: |
-        [{
-          "color": "#e11d48",
-          "blocks": [
-            {
-              "type": "section",
-              "text": { "type": "mrkdwn", "text": ":x: *Application {{.app.metadata.name}}* failed to sync." }
-            }
-          ]
-        }]
+  config.yaml: |
+    services:
+      slack:
+        token: \$slack-token
+    
+    templates:
+      app-deployed: |
+        message: |
+          🚀 **{{.app.metadata.name}}** successfully deployed!
+        slack:
+          attachments: |
+            [{
+              "title": "{{.app.metadata.name}} - Deployment Successful",
+              "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+              "color": "#18be52",
+              "fields": [
+                {
+                  "title": "Environment",
+                  "value": "{{.app.spec.destination.namespace}}",
+                  "short": true
+                },
+                {
+                  "title": "Sync Status", 
+                  "value": "{{.app.status.sync.status}}",
+                  "short": true
+                },
+                {
+                  "title": "Health",
+                  "value": "{{.app.status.health.status}}",
+                  "short": true
+                }
+              ]
+            }]
+
+      app-sync-failed: |
+        message: |
+          ❌ **{{.app.metadata.name}}** deployment failed!
+        slack:
+          attachments: |
+            [{
+              "title": "{{.app.metadata.name}} - Deployment Failed",
+              "title_link": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+              "color": "#E96D76",
+              "fields": [
+                {
+                  "title": "Sync Status",
+                  "value": "{{.app.status.sync.status}}",
+                  "short": true
+                },
+                {
+                  "title": "Operation State",
+                  "value": "{{.app.status.operationState.phase}}",
+                  "short": true
+                }
+              ]
+            }]
+
+    triggers:
+      on-deployed:
+        - when: app.status.operationState.phase in ['Succeeded'] and app.status.health.status == 'Healthy'
+          oncePer: app.status.sync.revision
+          send:
+          - app-deployed
+      
+      on-sync-failed:
+        - when: app.status.operationState.phase in ['Error', 'Failed']
+          send:
+          - app-sync-failed
+
+    subscriptions:
+      - recipients:
+        - slack
+        triggers:
+        - on-deployed
+        - on-sync-failed
