@@ -4,7 +4,7 @@ metadata:
   name: election-dapp
   namespace: election-dapp
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: election-dapp
