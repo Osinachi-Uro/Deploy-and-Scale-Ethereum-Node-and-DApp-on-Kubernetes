@@ -41,7 +41,7 @@ resource "helm_release" "argocd" {
           create = true
           name   = "cluster-admin"
         }
-      }
+      },
       notifications = {
         enabled = true
         secret = {
@@ -49,61 +49,69 @@ resource "helm_release" "argocd" {
             "slack-token" = var.slack_webhook_url
           }
         }
-        notifiers = {
-          slack = {
-            token = "$slack-token"
-          }
+        config = {
+          "service.slack" = <<EOT
+token: $slack-token
+EOT
+          "triggers"      = <<EOT
+triggers:
+  - name: on-sync-running
+    condition: app.status.operationState.phase in ['Running']
+    template: app-sync-running
+  - name: on-sync-succeeded
+    condition: app.status.operationState.phase in ['Succeeded']
+    template: app-deployed
+  - name: on-sync-failed
+    condition: app.status.operationState.phase in ['Failed']
+    template: app-sync-failed
+  - name: on-health-degraded
+    condition: app.status.health.status == 'Degraded'
+    template: app-health-degraded
+EOT
+          "templates"     = <<EOT
+templates:
+  - name: app-sync-running
+    slack:
+      attachments:
+        - title: "{{.app.metadata.name}} deployment started"
+          color: "#0DADEA"
+          text: "Namespace: {{.app.spec.destination.namespace}}, Initiated by: {{.app.status.operationState.operation.initiatedBy.username}}"
+
+  - name: app-deployed
+    slack:
+      attachments:
+        - title: "{{.app.metadata.name}} successfully deployed"
+          color: "#18be52"
+          text: "Namespace: {{.app.spec.destination.namespace}}, Revision: {{.app.status.sync.revision | substr 0 7}}"
+
+  - name: app-sync-failed
+    slack:
+      attachments:
+        - title: "{{.app.metadata.name}} sync failed"
+          color: "#E96D76"
+          text: "{{.app.status.operationState.message}}"
+
+  - name: app-health-degraded
+    slack:
+      attachments:
+        - title: "{{.app.metadata.name}} health degraded"
+          color: "#f4c430"
+          text: "Current health: {{.app.status.health.status}}"
+EOT
+          "subscriptions" = <<EOT
+subscriptions:
+  - recipients:
+      - slack:#general
+    triggers:
+      - on-sync-running
+      - on-sync-succeeded
+      - on-sync-failed
+      - on-health-degraded
+EOT
         }
-        triggers = {
-          on-sync-succeeded = [
-            {
-              when = "app.status.operationState.phase in ['Succeeded']"
-              send = ["slack"]
-            }
-          ]
-          on-sync-failed = [
-            {
-              when = "app.status.operationState.phase in ['Failed']"
-              send = ["slack"]
-            }
-          ]
-          on-health-degraded = [
-            {
-              when = "app.status.health.status == 'Degraded'"
-              send = ["slack"]
-            }
-          ]
-        }
-        subscriptions = [
-          {
-            recipients = ["slack:#general"]
-            triggers   = ["on-sync-succeeded", "on-sync-failed", "on-health-degraded"]
-          }
-        ]
       }
     })
   ]
 
   depends_on = [aws_eks_node_group.dapp]
 }
-
-# # Give ArgoCD proper permissions
-# resource "kubernetes_cluster_role_binding" "argocd_admin" {
-#   metadata {
-#     name = "argocd-application-controller"
-#   }
-
-#   role_ref {
-#     api_group = "rbac.authorization.k8s.io"
-#     kind      = "ClusterRole"
-#     name      = "cluster-admin"
-#   }
-
-#   subject {
-#     kind      = "ServiceAccount"
-#     name      = "argocd-application-controller"
-#     namespace = "argocd"
-#   }
-
-#   depends_on = [helm_release.argocd]
-# }
