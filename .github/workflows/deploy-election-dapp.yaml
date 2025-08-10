@@ -63,7 +63,6 @@ jobs:
       run: |
         echo "Deploying ArgoCD notification configs..."
         kubectl apply -f k8s/alerts/argocd-notifications-cm.yaml
-        kubectl apply -f k8s/alerts/argocd-notifications-controller.yaml
         kubectl apply -f k8s/alerts/argocd-notifications-secret.yaml
 
     - name: Patch Slack webhook secret
