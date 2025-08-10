@@ -2,7 +2,7 @@ name: Docker build-push Election DApp Image to ECR
 
 on:
   workflow_run:
-    workflows: ["Deploy EKS Infrastructure 2 on AWS"]
+    workflows: ["Deploy EKS Infrastructure on AWS"]
     types:
       - completed  
   push:
