@@ -42,65 +42,58 @@ resource "helm_release" "argocd" {
           name   = "cluster-admin"
         }
       },
-
-      configs = {
-        notifications = {
-          enabled = true
-
-          secret = {
-            items = {
-              slack-token = var.slack_webhook_url
-            }
+      notifications = {
+        enabled = true
+      },
+      extraObjects = [
+        {
+          apiVersion = "v1"
+          kind       = "ConfigMap"
+          metadata = {
+            name      = "argocd-notifications-cm"
+            namespace = "argocd"
           }
-
-          notifiers = {
-            "service.slack" = {
-              token = "$slack-token"
-            }
+          data = {
+            context = yamlencode({
+              argocdUrl = "https://argocd.example.com"
+            })
+            triggers = yamlencode({
+              on-sync-succeeded = {
+                when = "app.status.operationState.phase in ['Succeeded']"
+                send = ["slack"]
+              }
+              on-sync-failed = {
+                when = "app.status.operationState.phase in ['Failed']"
+                send = ["slack"]
+              }
+              on-health-degraded = {
+                when = "app.status.health.status == 'Degraded'"
+                send = ["slack"]
+              }
+              on-deployment-in-progress = {
+                when = "app.status.operationState.phase in ['Running']"
+                send = ["slack"]
+              }
+            })
+            templates = yamlencode({
+              slack = {
+                message = "{{.app.metadata.name}} - {{.app.status.operationState.phase}}"
+              }
+            })
+            subscriptions = yamlencode([
+              {
+                recipients = ["slack:#general"]
+                triggers   = ["on-sync-succeeded", "on-sync-failed", "on-health-degraded", "on-deployment-in-progress"]
+              }
+            ])
+            notifiers = yamlencode({
+              service.slack = {
+                token = "$slack-token"
+              }
+            })
           }
-
-          templates = {
-            app-sync-succeeded = {
-              message = "✅ Application {{.app.metadata.name}} sync succeeded."
-            }
-            app-sync-failed = {
-              message = "❌ Application {{.app.metadata.name}} sync failed."
-            }
-            app-health-degraded = {
-              message = "⚠️ Application {{.app.metadata.name}} health degraded."
-            }
-            app-deployment-in-progress = {
-              message = "🚀 Application {{.app.metadata.name}} deployment in progress..."
-            }
-          }
-
-          triggers = {
-            on-sync-succeeded = {
-              when = "app.status.operationState.phase in ['Succeeded']"
-              send = ["app-sync-succeeded"]
-            }
-            on-sync-failed = {
-              when = "app.status.operationState.phase in ['Failed']"
-              send = ["app-sync-failed"]
-            }
-            on-health-degraded = {
-              when = "app.status.health.status == 'Degraded'"
-              send = ["app-health-degraded"]
-            }
-            on-deployment-in-progress = {
-              when = "app.status.operationState.phase in ['Running']"
-              send = ["app-deployment-in-progress"]
-            }
-          }
-
-          subscriptions = [
-            {
-              recipients = ["slack:#general"]
-              triggers   = ["on-sync-succeeded", "on-sync-failed", "on-health-degraded", "on-deployment-in-progress"]
-            }
-          ]
         }
-      }
+      ]
     })
   ]
 
