@@ -4,12 +4,12 @@ metadata:
   name: election-dapp
   namespace: argocd
   annotations:
-    notifications.argoproj.io/subscribe.on-deployed.slack: "true"
-    notifications.argoproj.io/subscribe.on-sync-failed.slack: "true"
-    notifications.argoproj.io/subscribe.on-health-degraded.slack: "true"
-    notifications.argoproj.io/subscribe.on-sync-running.slack: "true"
-    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: "true"
-    notifications.argoproj.io/subscribe.on-manual-sync.slack: "true"
+    notifications.argoproj.io/subscribe.on-deployed.slack: Osinachi
+    notifications.argoproj.io/subscribe.on-sync-failed.slack: Osinachi
+    notifications.argoproj.io/subscribe.on-health-degraded.slack: Osinachi
+    notifications.argoproj.io/subscribe.on-sync-running.slack: Osinachi
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: Osinachi
+    notifications.argoproj.io/subscribe.on-manual-sync.slack: Osinachi
 spec:
   project: default
   source:
