@@ -60,7 +60,13 @@ resource "kubectl_manifest" "notifications_cm" {
 }
 
 resource "kubectl_manifest" "notifications_secret" {
-  yaml_body  = file("${path.module}/manifests/argocd-notifications-secret.yaml")
+  yaml_body = templatefile(
+    "${path.module}/manifests/argocd-notifications-secret.yaml.tpl",
+    {
+      slack_token = var.slack_webhook_url
+    }
+  )
+
   depends_on = [helm_release.argocd]
 }
 
