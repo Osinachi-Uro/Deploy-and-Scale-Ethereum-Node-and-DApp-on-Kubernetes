@@ -54,7 +54,7 @@ resource "helm_release" "argocd" {
           }
 
           notifiers = {
-            service.slack = {
+            "service.slack" = {
               token = "$slack-token"
             }
           }
