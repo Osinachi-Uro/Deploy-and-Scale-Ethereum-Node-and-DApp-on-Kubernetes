@@ -87,7 +87,7 @@ resource "helm_release" "argocd" {
               }
             ])
             notifiers = yamlencode({
-              service.slack = {
+              "service.slack" = {
                 token = "$slack-token"
               }
             })
