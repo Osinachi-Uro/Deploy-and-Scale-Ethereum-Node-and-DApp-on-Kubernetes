@@ -42,63 +42,62 @@ resource "helm_release" "argocd" {
           name   = "cluster-admin"
         }
       },
-      configs = {
-        notifications = {
-          enabled = true
-          secret = {
-            items = {
-              "slack-token" = var.slack_webhook_url
-            }
+
+      notifications = {
+        enabled = true
+
+        secret = {
+          items = {
+            slack-token = var.slack_webhook_url
           }
-          notifiers = {
-            "service.slack" = {
-              token = "$slack-token"
-            }
-          }
-          templates = {
-            app-sync-succeeded = {
-              message = "✅ Application {{.app.metadata.name}} synced successfully."
-            }
-            app-sync-failed = {
-              message = "❌ Application {{.app.metadata.name}} failed to sync."
-            }
-            app-health-degraded = {
-              message = "⚠️ Application {{.app.metadata.name}} has degraded health."
-            }
-            app-sync-running = {
-              message = "🚀 Sync in progress for {{.app.metadata.name}}..."
-            }
-          }
-          triggers = {
-            on-sync-succeeded = {
-              when = "app.status.operationState.phase in ['Succeeded']"
-              send = ["app-sync-succeeded"]
-            }
-            on-sync-failed = {
-              when = "app.status.operationState.phase in ['Failed']"
-              send = ["app-sync-failed"]
-            }
-            on-health-degraded = {
-              when = "app.status.health.status == 'Degraded'"
-              send = ["app-health-degraded"]
-            }
-            on-sync-running = {
-              when = "app.status.operationState.phase in ['Running']"
-              send = ["app-sync-running"]
-            }
-          }
-          subscriptions = [
-            {
-              recipients = ["slack:#general"]
-              triggers = [
-                "on-sync-succeeded",
-                "on-sync-failed",
-                "on-health-degraded",
-                "on-sync-running"
-              ]
-            }
-          ]
         }
+
+        notifiers = {
+          service.slack = {
+            token = "$slack-token"
+          }
+        }
+
+        templates = {
+          app-sync-succeeded = {
+            message = "✅ Application {{.app.metadata.name}} sync succeeded."
+          }
+          app-sync-failed = {
+            message = "❌ Application {{.app.metadata.name}} sync failed."
+          }
+          app-health-degraded = {
+            message = "⚠️ Application {{.app.metadata.name}} health degraded."
+          }
+          app-deployment-in-progress = {
+            message = "🚀 Application {{.app.metadata.name}} deployment in progress..."
+          }
+        }
+
+        triggers = {
+          on-sync-succeeded = {
+            when = "app.status.operationState.phase in ['Succeeded']"
+            send = ["app-sync-succeeded"]
+          }
+          on-sync-failed = {
+            when = "app.status.operationState.phase in ['Failed']"
+            send = ["app-sync-failed"]
+          }
+          on-health-degraded = {
+            when = "app.status.health.status == 'Degraded'"
+            send = ["app-health-degraded"]
+          }
+          on-deployment-in-progress = {
+            when = "app.status.operationState.phase in ['Running']"
+            send = ["app-deployment-in-progress"]
+          }
+        }
+
+        subscriptions = [
+          {
+            recipients = ["slack:#general"]
+            triggers   = ["on-sync-succeeded", "on-sync-failed", "on-health-degraded", "on-deployment-in-progress"]
+          }
+        ]
       }
     })
   ]
