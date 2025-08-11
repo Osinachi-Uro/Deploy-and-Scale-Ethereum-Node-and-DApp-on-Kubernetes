@@ -73,7 +73,7 @@ locals {
 
 # Render ConfigMap
 data "template_file" "notifications_cm" {
-  template = file("${path.manifests}/argocd-notifications-cm.yaml.tmpl")
+  template = file("${path.module}/manifests/argocd-notifications-cm.yaml.tmpl")
   vars = {
     argocd_url = local.argocd_url
   }
@@ -91,7 +91,7 @@ resource "kubectl_manifest" "notifications_cm" {
 
 # Render Secret
 data "template_file" "notifications_secret" {
-  template = file("${path.manifests}/argocd-notifications-secret.yaml.tmpl")
+  template = file("${path.module}/manifests/argocd-notifications-secret.yaml.tmpl")
   vars = {
     slack_webhook_url = var.slack_webhook_url
   }
