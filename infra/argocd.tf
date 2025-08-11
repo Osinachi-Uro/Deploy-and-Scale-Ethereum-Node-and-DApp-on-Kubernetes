@@ -42,72 +42,62 @@ resource "helm_release" "argocd" {
           name   = "cluster-admin"
         }
       },
-      notifications = {
-        enabled = true
-        secret = {
-          items = {
-            "slack-token" = var.slack_webhook_url
+      configs = {
+        notifications = {
+          enabled = true
+          secret = {
+            items = {
+              "slack-token" = var.slack_webhook_url
+            }
           }
-        }
-        config = {
-          "service.slack" = <<EOT
-token: $slack-token
-EOT
-          "triggers"      = <<EOT
-triggers:
-  - name: on-sync-running
-    condition: app.status.operationState.phase in ['Running']
-    template: app-sync-running
-  - name: on-sync-succeeded
-    condition: app.status.operationState.phase in ['Succeeded']
-    template: app-deployed
-  - name: on-sync-failed
-    condition: app.status.operationState.phase in ['Failed']
-    template: app-sync-failed
-  - name: on-health-degraded
-    condition: app.status.health.status == 'Degraded'
-    template: app-health-degraded
-EOT
-          "templates"     = <<EOT
-templates:
-  - name: app-sync-running
-    slack:
-      attachments:
-        - title: "{{.app.metadata.name}} deployment started"
-          color: "#0DADEA"
-          text: "Namespace: {{.app.spec.destination.namespace}}, Initiated by: {{.app.status.operationState.operation.initiatedBy.username}}"
-
-  - name: app-deployed
-    slack:
-      attachments:
-        - title: "{{.app.metadata.name}} successfully deployed"
-          color: "#18be52"
-          text: "Namespace: {{.app.spec.destination.namespace}}, Revision: {{.app.status.sync.revision | substr 0 7}}"
-
-  - name: app-sync-failed
-    slack:
-      attachments:
-        - title: "{{.app.metadata.name}} sync failed"
-          color: "#E96D76"
-          text: "{{.app.status.operationState.message}}"
-
-  - name: app-health-degraded
-    slack:
-      attachments:
-        - title: "{{.app.metadata.name}} health degraded"
-          color: "#f4c430"
-          text: "Current health: {{.app.status.health.status}}"
-EOT
-          "subscriptions" = <<EOT
-subscriptions:
-  - recipients:
-      - slack:#general
-    triggers:
-      - on-sync-running
-      - on-sync-succeeded
-      - on-sync-failed
-      - on-health-degraded
-EOT
+          notifiers = {
+            service.slack = {
+              token = "$slack-token"
+            }
+          }
+          templates = {
+            app-sync-succeeded = {
+              message = "✅ Application {{.app.metadata.name}} synced successfully."
+            }
+            app-sync-failed = {
+              message = "❌ Application {{.app.metadata.name}} failed to sync."
+            }
+            app-health-degraded = {
+              message = "⚠️ Application {{.app.metadata.name}} has degraded health."
+            }
+            app-sync-running = {
+              message = "🚀 Sync in progress for {{.app.metadata.name}}..."
+            }
+          }
+          triggers = {
+            on-sync-succeeded = {
+              when = "app.status.operationState.phase in ['Succeeded']"
+              send = ["app-sync-succeeded"]
+            }
+            on-sync-failed = {
+              when = "app.status.operationState.phase in ['Failed']"
+              send = ["app-sync-failed"]
+            }
+            on-health-degraded = {
+              when = "app.status.health.status == 'Degraded'"
+              send = ["app-health-degraded"]
+            }
+            on-sync-running = {
+              when = "app.status.operationState.phase in ['Running']"
+              send = ["app-sync-running"]
+            }
+          }
+          subscriptions = [
+            {
+              recipients = ["slack:#general"]
+              triggers = [
+                "on-sync-succeeded",
+                "on-sync-failed",
+                "on-health-degraded",
+                "on-sync-running"
+              ]
+            }
+          ]
         }
       }
     })
