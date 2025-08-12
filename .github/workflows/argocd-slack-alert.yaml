@@ -1,4 +1,4 @@
-name: Deploy Election DApp
+name: Configure ArgoCD Slack Alert
 
 on:
 #   workflow_run:
@@ -42,29 +42,16 @@ jobs:
         aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
 
 
-    - name: Configure ArgoCD - Slack Notification
+    - name: Create ArgoCD notifications secret
       run: |
-        echo "Configuring ArgoCD notification to Slack"
-        kubectl apply -f alerts/argocd-notifications-cm.yaml
-        kubectl apply -f alerts/argocd-notifications-secret.yaml
-      env: 
-        slack_token: ${{ env.SLACK_TOKEN }}
-        
-    # - name: Patch Slack token secret
-    #   run: |
-    #     echo "Ensuring Slack token secret exists..."
-    #     if ! kubectl get secret argocd-notifications-secret -n argocd >/dev/null 2>&1; then
-    #       echo "Secret does not exist. Creating..."
-    #       kubectl create secret generic argocd-notifications-secret \
-    #         -n argocd \
-    #         --from-literal=slack-token="${{ secrets.SLACK_TOKEN }}"
-    #     else
-    #       echo "Secret exists. Patching..."
-    #       kubectl patch secret argocd-notifications-secret -n argocd \
-    #         --type merge \
-    #         -p "{\"stringData\": {\"slack-token\": \"${{ secrets.SLACK_TOKEN }}\"}}"
-    #     fi
+        kubectl -n argocd create secret generic argocd-notifications-secret \
+          --from-literal=slack-token="${{ secrets.SLACK_TOKEN }}" \
+          --dry-run=client -o yaml | kubectl apply -f -
 
+    - name: Apply ArgoCD configuration
+      run: |
+        kubectl apply -f k8s/argocd-notifications-cm.yaml
+        kubectl rollout restart deployment argocd-notifications-controller -n argocd
 
     - name: Create ArgoCD Application
       run: |

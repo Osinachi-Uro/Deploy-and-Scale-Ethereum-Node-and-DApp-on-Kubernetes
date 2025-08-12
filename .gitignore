@@ -9,5 +9,5 @@
 .terraform.lock.hcl
 .terraform
 
-Variable Values
+# Variable Values
 *.tfvars
