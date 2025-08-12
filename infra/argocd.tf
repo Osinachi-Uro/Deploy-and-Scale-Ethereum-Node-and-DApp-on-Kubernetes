@@ -55,52 +55,52 @@ resource "helm_release" "argocd" {
   depends_on = [aws_eks_node_group.dapp]
 }
 
-# Wait for ArgoCD load balancer
-data "kubernetes_service" "argocd_server" {
-  metadata {
-    name      = "argocd-server"
-    namespace = "argocd"
-  }
-  depends_on = [helm_release.argocd]
-}
-
-locals {
-  argocd_url = coalesce(
-    try(data.kubernetes_service.argocd_server.status[0].load_balancer[0].ingress[0].hostname, null),
-    try(data.kubernetes_service.argocd_server.status[0].load_balancer[0].ingress[0].ip, null)
-  )
-}
-
-# Render ConfigMap
-data "template_file" "notifications_cm" {
-  template = file("${path.module}/manifests/argocd-notifications-cm.yaml.tmpl")
-  vars = {
-    argocd_url = local.argocd_url
-  }
-}
-
-resource "kubectl_manifest" "notifications_cm" {
-  yaml_body  = data.template_file.notifications_cm.rendered
-  depends_on = [helm_release.argocd]
-}
-
-# resource "kubectl_manifest" "notifications_cm" {
-#   yaml_body  = file("${path.module}/manifests/argocd-notifications-cm.yaml")
+# # Wait for ArgoCD load balancer
+# data "kubernetes_service" "argocd_server" {
+#   metadata {
+#     name      = "argocd-server"
+#     namespace = "argocd"
+#   }
 #   depends_on = [helm_release.argocd]
 # }
 
-# Render Secret
-data "template_file" "notifications_secret" {
-  template = file("${path.module}/manifests/argocd-notifications-secret.yaml.tmpl")
-  vars = {
-    slack_webhook_url = var.slack_webhook_url
-  }
-}
+# locals {
+#   argocd_url = coalesce(
+#     try(data.kubernetes_service.argocd_server.status[0].load_balancer[0].ingress[0].hostname, null),
+#     try(data.kubernetes_service.argocd_server.status[0].load_balancer[0].ingress[0].ip, null)
+#   )
+# }
 
-resource "kubectl_manifest" "notifications_secret" {
-  yaml_body  = data.template_file.notifications_secret.rendered
-  depends_on = [helm_release.argocd]
-}
+# # Render ConfigMap
+# data "template_file" "notifications_cm" {
+#   template = file("${path.module}/manifests/argocd-notifications-cm.yaml.tmpl")
+#   vars = {
+#     argocd_url = local.argocd_url
+#   }
+# }
+
+# resource "kubectl_manifest" "notifications_cm" {
+#   yaml_body  = data.template_file.notifications_cm.rendered
+#   depends_on = [helm_release.argocd]
+# }
+
+# # resource "kubectl_manifest" "notifications_cm" {
+# #   yaml_body  = file("${path.module}/manifests/argocd-notifications-cm.yaml")
+# #   depends_on = [helm_release.argocd]
+# # }
+
+# # Render Secret
+# data "template_file" "notifications_secret" {
+#   template = file("${path.module}/manifests/argocd-notifications-secret.yaml.tmpl")
+#   vars = {
+#     slack_webhook_url = var.slack_webhook_url
+#   }
+# }
+
+# resource "kubectl_manifest" "notifications_secret" {
+#   yaml_body  = data.template_file.notifications_secret.rendered
+#   depends_on = [helm_release.argocd]
+# }
 
 # resource "kubectl_manifest" "notifications_secret" {
 #   yaml_body = templatefile(

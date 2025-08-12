@@ -17,6 +17,7 @@ env:
   EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
   ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
   ECR_REPOSITORY: ${{ secrets.REPOSITORY_NAME }}
+  SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
 
 jobs:
   deploy:
@@ -59,32 +60,35 @@ jobs:
       run: |
         kubectl wait --for=condition=available --timeout=300s deployment/election-dapp -n election-dapp
 
-    # - name: Deploy ArgoCD Notifications configs
+    # - name: Configure ArgoCD Notification to Slack
     #   run: |
-    #     echo "Deploying ArgoCD notification configs..."
+    #     echo "Configuring ArgoCD notification to Slack"
     #     kubectl apply -f k8s/alerts/argocd-notifications-cm.yaml
     #     kubectl apply -f k8s/alerts/argocd-notifications-secret.yaml
+    #   env: 
+    #     slack_token: ${{ env.SLACK_TOKEN }}
+        
 
-    # - name: Patch Slack webhook secret
+    # - name: Patch Slack token secret
     #   run: |
-    #     echo "Ensuring Slack webhook secret exists..."
+    #     echo "Ensuring Slack token secret exists..."
     #     if ! kubectl get secret argocd-notifications-secret -n argocd >/dev/null 2>&1; then
     #       echo "Secret does not exist. Creating..."
     #       kubectl create secret generic argocd-notifications-secret \
     #         -n argocd \
-    #         --from-literal=slack-token="${{ secrets.SLACK_WEBHOOK_URL }}"
+    #         --from-literal=slack-token="${{ secrets.SLACK_TOKEN }}"
     #     else
     #       echo "Secret exists. Patching..."
     #       kubectl patch secret argocd-notifications-secret -n argocd \
     #         --type merge \
-    #         -p "{\"stringData\": {\"slack-token\": \"${{ secrets.SLACK_WEBHOOK_URL }}\"}}"
+    #         -p "{\"stringData\": {\"slack-token\": \"${{ secrets.SLACK_TOKEN }}\"}}"
     #     fi
 
 
-    - name: Create ArgoCD Application
-      run: |
-        echo "Creating ArgoCD Application..."
-        kubectl apply -f k8s/argocd-application.yaml
+    # - name: Create ArgoCD Application
+    #   run: |
+    #     echo "Creating ArgoCD Application..."
+    #     kubectl apply -f k8s/argocd-application.yaml
 
     - name: Get service URLs
       run: |
