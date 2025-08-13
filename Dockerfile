@@ -1,42 +1,4 @@
-# #======================
-# # For Github Action
-# #======================
-# # Stage 1: Truffle compile and prepare files
-# FROM node:18 AS build-stage
-
-# WORKDIR /app
-
-# # Copy DApp contract files
-# COPY package*.json ./
-# COPY truffle-config.js ./
-# COPY contracts ./contracts
-# COPY migrations ./migrations
-
-# # Install Truffle and dependencies
-# RUN npm install -g truffle && npm install
-
-# # Compile contracts
-# RUN truffle compile
-
-# # Copy frontend files
-# COPY src ./src
-
-# # Stage 2: Nginx to serve static content
-# FROM nginx:alpine
-
-# # Copy frontend to serve from nginx
-# COPY --from=build-stage /app/src /usr/share/nginx/html
-
-# # (Optional) Copy contract ABIs to frontend (can access via JS if needed)
-# COPY --from=build-stage /app/build/contracts /usr/share/nginx/html/abis
-
-# # Expose web port
-# EXPOSE 80
-
-# CMD ["nginx", "-g", "daemon off;"]
-
-
-# Dockerfile for Local Build and Test
+# Node as base image
 FROM node:18
 
 # Set working directory
@@ -54,7 +16,7 @@ RUN npm install -g truffle@5.11.5 http-server && \
     npm install && \
     truffle compile
 
-# Build contracts
+# Build/compile contracts
 RUN truffle compile --all
 
 # Copy compiled ABI JSONs into the folder served by http-server

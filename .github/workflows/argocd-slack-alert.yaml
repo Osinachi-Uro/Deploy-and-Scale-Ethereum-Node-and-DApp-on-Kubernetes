@@ -1,10 +1,10 @@
 name: Configure ArgoCD Slack Alert
 
 on:
-#   workflow_run:
-#     workflows: ["Docker build-push Election DApp Image to ECR"]
-#     types:
-#       - completed 
+  workflow_run:
+    workflows: ["Deploy Election DApp"]
+    types:
+      - completed 
   push:
     branches: [ main ]
     paths:

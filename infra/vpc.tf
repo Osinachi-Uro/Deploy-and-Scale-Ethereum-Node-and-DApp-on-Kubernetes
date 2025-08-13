@@ -31,10 +31,8 @@ resource "aws_security_group" "eks_nodes_sg" {
 
 # Allow all inbound traffic from within the same security group (node-to-node)
 resource "aws_vpc_security_group_ingress_rule" "node_to_node" {
-  security_group_id = aws_security_group.eks_nodes_sg.id
-  description       = "Allow node-to-node communication"
-  # from_port                    = 0
-  # to_port                      = 0
+  security_group_id            = aws_security_group.eks_nodes_sg.id
+  description                  = "Allow node-to-node communication"
   ip_protocol                  = "-1" # all protocols
   referenced_security_group_id = aws_security_group.eks_nodes_sg.id
 }
